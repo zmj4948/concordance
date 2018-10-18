@@ -63,7 +63,11 @@ void traverse_tree(const TreeNode *root){
 	if(root==NULL)
 		return;
 	traverse_tree(root->left);
-	printf("%s : %d\n",root->word, root->frequency);
+	printf("%s ( %d): ",root->word, root->frequency);
+	for(int i=0;i<root->frequency;i++){
+		printf("%d, ",root->references[i]);
+	}
+	printf("\n");
 	traverse_tree(root->right); 
 }
 
@@ -75,7 +79,6 @@ void cleanup_tree(const TreeNode *root){
 		cleanup_tree(root->right);
 		free(root->word);
 		free(root->references);
-		free(&root);
 	}
 }
 
@@ -86,12 +89,26 @@ int main(int argc,char *argv[]){
 		//TO-DO
 		//when calling insert, pass the address of the node into it
 		TreeNode *root=NULL;
-		insert_word(&root,"BITCH");
-		insert_word(&root,"fuck");
-		insert_word(&root,"help");
-		insert_word(&root,"me");
+		size_t len=0;
+		char *token;
+		char *buf=NULL;
+		char space[]=" ";
+		while(getline(&buf, &len,stdin)>0){
+			token=strtok(buf,space);
+			while(token!=NULL){
+				if(token!="\n"){
+					insert_word(&root,token);
+				}
+				token=strtok(NULL,space);
+			}
+			CurrentLine++;
+			
+		}
+		if(buf!=NULL){
+			free(buf);
+		}
 		traverse_tree(root);
-		
+		cleanup_tree(root);
 	}
 	return 0;
 }
